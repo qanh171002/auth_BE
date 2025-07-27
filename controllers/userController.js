@@ -66,7 +66,42 @@ exports.login = async (req, res) => {
       success: true,
       message: "Login successful",
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { name: user.name, email: user.email },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+    const token = authHeader.split(" ")[1];
+    let payload;
+    try {
+      payload = jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    const user = await User.findByPk(payload.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      user: { name: user.name, email: user.email },
     });
   } catch (error) {
     return res.status(500).json({
