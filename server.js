@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/", userRoute);
+app.use("/api", userRoute);
 
 // Test DB connection
 sequelize
@@ -25,8 +25,3 @@ sequelize
     });
   })
   .catch((err) => console.error("Unable to connect to DB:", err));
-
-// Simple route
-app.get("/", (req, res) => {
-  res.send("API is running");
-});
